@@ -40,29 +40,23 @@ export async function getAll(userId: string): Promise<TodoItem[]> {
 export async function updateTodo(userId: string, todoId: string, request: UpdateTodoRequest): Promise<TodoItem> {
     logger.info(`Updating todo ${request} by userId ${userId} and todoId ${todoId}`)
 
-    const todo = await toDoAccess.getToDo(todoId)
+    const todo = await toDoAccess.getToDo(todoId, userId)
 
     if(!todo)
         throw new Error('Todo not found')
 
-    if(todo.userId !== userId)
-        throw new Error('User is not authorized to modify')
-
-    return await toDoAccess.updateToDo(todoId, request)
+    return await toDoAccess.updateToDo(todoId, userId, request)
 }
 
 export async function deleteTodo(userId: string, todoId: string) {
     logger.info(`deleting todo ${todoId} for user ${userId}`)
 
-    const todo = await toDoAccess.getToDo(todoId)
+    const todo = await toDoAccess.getToDo(todoId, userId)
 
     if(!todo)
         throw new Error('Todo not found')
 
-    if(todo.userId !== userId)
-        throw new Error('User is not authorized to delete')
-
-    await toDoAccess.deleteTodo(todoId)
+    await toDoAccess.deleteTodo(todoId, userId)
 }
 
 export async function updateUrl(userId: string, todoId: string, attachmentId: string) {
@@ -70,15 +64,12 @@ export async function updateUrl(userId: string, todoId: string, attachmentId: st
 
     const attachmentUrl = await attachmentUtils.getUrl(attachmentId)
 
-    const todo = await toDoAccess.getToDo(todoId)
+    const todo = await toDoAccess.getToDo(todoId, userId)
 
     if(!todo)
         throw new Error('Todo not found')
 
-    if(todo.userId !== userId)
-        throw new Error('User is not authorized to update attachment')
-
-    await toDoAccess.updateUrl(todoId, attachmentUrl)
+    await toDoAccess.updateUrl(todoId, userId, attachmentUrl)
 }
 
 export async function generateSignedUrl(attachmentId: string): Promise<String> {

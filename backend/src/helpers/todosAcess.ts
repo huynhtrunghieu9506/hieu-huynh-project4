@@ -32,13 +32,14 @@ export class ToDosAccess {
             return result.Items as TodoItem[]
         }
 
-        async getToDo(todoId: string): Promise<TodoItem> {
+        async getToDo(todoId: string, userId: string): Promise<TodoItem> {
             logger.info(`Get todo by id ${todoId}`)
 
             const result = await this.docClient.get({
                 TableName: this.todosTable,
                 Key: {
-                    todoId: todoId
+                    todoId: todoId,
+                    userId: userId
                 }
             }).promise()
 
@@ -53,12 +54,13 @@ export class ToDosAccess {
             }).promise()
         }
 
-        async updateToDo(todoId: string, todoUpdate: TodoUpdate): Promise<TodoItem> {
+        async updateToDo(todoId: string, userId: string, todoUpdate: TodoUpdate): Promise<TodoItem> {
             logger.info(`Update to do item ${todoId} with id ${todoId}`)
             await this.docClient.update({
                 TableName: this.todosTable,
                 Key: {
-                    todoId: todoId
+                    todoId: todoId,
+                    userId: userId
                 },
                 UpdateExpression: 'set #name = :name, dueDate = :dueDate, done = :done',
                 ExpressionAttributeNames: {
@@ -71,27 +73,29 @@ export class ToDosAccess {
                 }
             }).promise()
 
-            return await this.getToDo(todoId)
+            return await this.getToDo(todoId, userId)
         }
 
-        async deleteTodo(todoId: string) {
+        async deleteTodo(todoId: string, userId: string) {
             logger.info(`Deleing todo id ${todoId}`)
             
            await this.docClient.delete({
                 TableName: this.todosTable,
                 Key: {
-                    todoId: todoId
+                    todoId: todoId,
+                    userId: userId
                 }
             }).promise()
         }
 
-        async updateUrl(todoId: String, url: string) {
+        async updateUrl(todoId: String, userId: string, url: string) {
             logger.info(`Updating todo url ${url} for id ${todoId}`)
 
             await this.docClient.update({
                 TableName: this.todosTable,
                 Key: {
-                    todoId: todoId
+                    todoId: todoId,
+                    userId: userId
                 },
                 UpdateExpression: 'set attachmentUrl = :url',
                 ExpressionAttributeValues: {
